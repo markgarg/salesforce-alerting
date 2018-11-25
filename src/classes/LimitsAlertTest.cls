@@ -37,18 +37,20 @@ private class LimitsAlertTest
 			Test.setMock(HttpCalloutMock.class, mock);
 			LimitsAlert alert = new LimitsAlert();
 			Boolean shouldAlert = alert.shouldAlert();
-			String message = alert.getMessage();
+			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
 
 		// Then
 		System.assert(shouldAlert == true);
-		System.assert(message.containsIgnoreCase('DailyApiRequests'));
-		System.assert(message.containsIgnoreCase('"Max": 15000'));
-		System.assert(message.containsIgnoreCase('"Remaining": 3000'));
+		System.assert(messages.size() == 1);
+		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM);
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyApiRequests'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 15000'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 3000'));
 	}
 
 	@isTest
-	static void itShouldAlertWithMediumWhenThereIsABigProblem()
+	static void itShouldAlertWithHighWhenThereIsABigProblem()
 	{
 		// Given
 		final String responseBody = getLimitsBody('15000', '20');
@@ -62,18 +64,20 @@ private class LimitsAlertTest
 			Test.setMock(HttpCalloutMock.class, mock);
 			LimitsAlert alert = new LimitsAlert();
 			Boolean shouldAlert = alert.shouldAlert();
-			String message = alert.getMessage();
+			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
 
 		// Then
 		System.assert(shouldAlert == true);
-		System.assert(message.containsIgnoreCase('DailyBulkApiRequests'));
-		System.assert(message.containsIgnoreCase('"Max": 5000'));
-		System.assert(message.containsIgnoreCase('"Remaining": 20'));
+		System.assert(messages.size() == 1);
+		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH);
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 20'));
 	}
 
 	@isTest
-	static void itShouldAlertWithMediumWhenThereAreProblems()
+	static void itShouldAlertWithHighWhenThereAreBigProblems()
 	{
 		// Given
 		final String responseBody = getLimitsBody('200', '20');
@@ -87,21 +91,31 @@ private class LimitsAlertTest
 			Test.setMock(HttpCalloutMock.class, mock);
 			LimitsAlert alert = new LimitsAlert();
 			Boolean shouldAlert = alert.shouldAlert();
-			String message = alert.getMessage();
+			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
 
 		// Then
 		System.assert(shouldAlert == true);
-		System.assert(message.containsIgnoreCase('DailyApiRequests'));
-		System.assert(message.containsIgnoreCase('"Max": 15000'));
-		System.assert(message.containsIgnoreCase('"Remaining": 200'));
-		System.assert(message.containsIgnoreCase('DailyBulkApiRequests'));
-		System.assert(message.containsIgnoreCase('"Max": 5000'));
-		System.assert(message.containsIgnoreCase('"Remaining": 20'));
+		System.assert(messages.size() == 2);
+		Boolean hasApi = false, hasBulkApi = false;
+		for(AlertMessage am : messages) {
+			if (am.message.containsIgnoreCase('DailyApiRequests')){
+				hasApi = true;
+				System.assert(am.level == AlertMessage.Severity.HIGH);
+				System.assert(am.message.containsIgnoreCase('"Max": 15000'));
+				System.assert(am.message.containsIgnoreCase('"Remaining": 200'));
+			} else if (am.message.containsIgnoreCase('DailyBulkApiRequests')) {
+				hasBulkApi = true;
+				System.assert(am.level == AlertMessage.Severity.HIGH);
+				System.assert(am.message.containsIgnoreCase('"Max": 5000'));
+				System.assert(am.message.containsIgnoreCase('"Remaining": 20'));
+			}
+		}
+		System.assert(hasApi && hasBulkApi);
 	}
 
 	@isTest
-	static void itShouldAlertWhenAPIFails()
+	static void itShouldAlertHighWhenAPIFails()
 	{
 		// Given
 		final Map<String, String> responseHeaders = new Map<String, String>();
@@ -113,12 +127,13 @@ private class LimitsAlertTest
 			Test.setMock(HttpCalloutMock.class, mock);
 			LimitsAlert alert = new LimitsAlert();
 			Boolean shouldAlert = alert.shouldAlert();
-			String message = alert.getMessage();
+			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
 
 		// Then
 		System.assert(shouldAlert == true);
-		System.assert(message.contains(LimitsAlert.LIMIT_EXCEPTION_BASE_MSG));
+		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH);
+		System.assert(messages.get(0).message.contains(LimitsAlert.LIMIT_EXCEPTION_BASE_MSG));
 	}
 
 	static String getLimitsBody(String apiCount, String bulkApiCount) {

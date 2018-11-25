@@ -14,16 +14,15 @@ public without sharing class LimitsAlert implements Alert {
 		return !alertMessages.isEmpty();
 	}
 
-	public String getMessage() {
-		if(alertMessages == null)
-			return null;
+	public List<AlertMessage> getMessages() {
+		return alertMessages;
 
-		String message = '';
-		for(AlertMessage am : alertMessages) {
-			message += am;
-			message += '\n';
-		}
+		//String message = '';
+		//for(AlertMessage am : alertMessages) {
+		//	message += am;
+		//	message += '\n';
+		//}
 
-		return message;
+		//return message;
 	}	
 }

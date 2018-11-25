@@ -1,4 +1,4 @@
 public interface Alert {
 	Boolean shouldAlert();
-	String getMessage();
+	List<AlertMessage> getMessages();
 }
