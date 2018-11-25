@@ -5,6 +5,7 @@ public class AlertHttpCalloutMock implements HttpCalloutMock {
     protected String status;
     protected String body;
     protected Map<String, String> responseHeaders;
+    private String urlToCheck;
 
     public AlertHttpCalloutMock(Integer code, String status, String body, Map<String, String> responseHeaders) {
         this.code = code;
@@ -13,7 +14,15 @@ public class AlertHttpCalloutMock implements HttpCalloutMock {
         this.responseHeaders = responseHeaders;
     }
 
+    public AlertHttpCalloutMock assertURL(final String url) {
+        this.urlToCheck = url;
+        return this;
+    }
+
     public HTTPResponse respond(HTTPRequest req) {
+        if(String.isNotBlank(urlToCheck)) {
+            System.assert(req.getEndpoint().contains(urlToCheck));
+        }
 
         HttpResponse res = new HttpResponse();
         for (String key : this.responseHeaders.keySet()) {
