@@ -16,13 +16,5 @@ public without sharing class LimitsAlert implements Alert {
 
 	public List<AlertMessage> getMessages() {
 		return alertMessages;
-
-		//String message = '';
-		//for(AlertMessage am : alertMessages) {
-		//	message += am;
-		//	message += '\n';
-		//}
-
-		//return message;
 	}	
 }

@@ -21,7 +21,7 @@ public without sharing class SlackAlertInvoker implements AlertInvoker {
 		reqBody.icon_emoji = slackConfig.Emoji_Icon__c;
 
 		List<String> msgBody = new List<String>();
-		final String template = '```Severity: {0},\n{1}```';
+		final String template = '```Severity: {0}\n{1}```';
 		for(AlertMessage am : alertMessages) {
 			msgBody.add(String.format(template, 
 				new List<String>{am.level.name(), am.message}));
