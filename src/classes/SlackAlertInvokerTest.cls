@@ -11,8 +11,16 @@ private class SlackAlertInvokerTest
 		final Map<String, String> responseHeaders = new Map<String, String>();
 		responseHeaders.put('Content-Type', 'text/html');
 		
+		List<String> bodyContainsAsserts = new List<String>();
+		bodyContainsAsserts.add('"channel":"#crm-alert-dev"');
+		bodyContainsAsserts.add('"username":"salesforcebot"');
+		bodyContainsAsserts.add('"icon_emoji":":salesforce:"');
+		bodyContainsAsserts.add('Test 1');
+		bodyContainsAsserts.add('Test 2');
+
 		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK', 'ok', responseHeaders)
-			.assertURL('https://hooks.slack.com/services');
+			.assertURL('https://hooks.slack.com/services') // Then
+			.assertBodyContains(bodyContainsAsserts); // Then
 
 		// When
 		Test.startTest();
@@ -20,7 +28,5 @@ private class SlackAlertInvokerTest
 			SlackAlertInvoker invoker = new SlackAlertInvoker();
 			invoker.invokeAlert(new List<AlertMessage>{am1, am2});
 		Test.stopTest();
-		// Then
-
 	}
 }

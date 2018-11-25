@@ -37,10 +37,10 @@ public without sharing class LimitsAlertHelper {
 	}
 
 	private static String buildMessage(String key, Integer max, Integer remaining) {
-		final String msg = '```"' + key + '": {'
+		final String msg = '"' + key + '": {'
 		                   + '\n\t"Max": ' + max + ','
 		                   + '\n\t"Remaining": ' + remaining
-		                   + '\n}```';
+		                   + '\n}';
 		return msg;
 	}
 }
