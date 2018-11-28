@@ -1,5 +1,7 @@
 public without sharing class LimitsAlertHelper {
 	public static final String API_VERSION = 'v44.0';
+	public static final String URL_PATH = 'callout:{0}/services/data/{1}/limits';
+	public static final String NAMED_CREDENTIAL = 'InternalRestAPI';
 
 	public static List<AlertMessage> getAlerts() {
 		Map<String, Object> limitsMap = getLimits();
@@ -7,12 +9,9 @@ public without sharing class LimitsAlertHelper {
 	}
 
 	private static Map<String, Object> getLimits() {
-		final String baseURL = URL.getSalesforceBaseUrl().toExternalForm();
-		final String path = String.format('/services/data/{0}/limits',
-		                                  new List<String> {API_VERSION});
-		final String url = baseURL + path;
-
-		final String response = CalloutHelper.makeHTTPCallout(url, 'GET', null, null);
+		final String path = String.format(URL_PATH,
+		                                  new List<String> {NAMED_CREDENTIAL, API_VERSION});
+		final String response = CalloutHelper.makeHTTPCallout(path, 'GET', null, null);
 		Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(response);
 
 		return responseMap;

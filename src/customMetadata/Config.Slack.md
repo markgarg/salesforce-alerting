@@ -6,4 +6,16 @@
         <field>Alert_URL__c</field>
         <value xsi:type="xsd:string">https://hooks.slack.com/services/DUMMY</value>
     </values>
+    <values>
+        <field>Channel_Name__c</field>
+        <value xsi:type="xsd:string">#channel-name</value>
+    </values>
+    <values>
+        <field>Emoji_Icon__c</field>
+        <value xsi:type="xsd:string">:salesforce:</value>
+    </values>
+    <values>
+        <field>Username__c</field>
+        <value xsi:type="xsd:string">salesforcebot</value>
+    </values>
 </CustomMetadata>
