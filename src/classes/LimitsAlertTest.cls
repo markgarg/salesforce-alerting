@@ -2,6 +2,28 @@
 private class LimitsAlertTest
 {
 	@isTest
+	static void itShouldAlertHighWhenAPIFails()
+	{
+		// Given
+		final Map<String, String> responseHeaders = new Map<String, String>();
+		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(500, 'Internal Server Error',
+			null, responseHeaders);
+		
+		// When
+		Test.startTest();
+			Test.setMock(HttpCalloutMock.class, mock);
+			LimitsAlert alert = new LimitsAlert(null);
+			Boolean shouldAlert = alert.shouldAlert();
+			List<AlertMessage> messages = alert.getMessages();
+		Test.stopTest();
+
+		// Then
+		System.assert(shouldAlert == true);
+		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH);
+		System.assert(messages.get(0).message.contains(LimitsAlertHelper.LIMIT_EXCEPTION_BASE_MSG));
+	}
+
+	@isTest
 	static void itShouldNotAlertWhenThereIsNoProblem()
 	{
 		// Given
@@ -11,10 +33,18 @@ private class LimitsAlertTest
 		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
 			responseBody, responseHeaders);
 		
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
+
 		// When
 		Test.startTest();
 			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert();
+			LimitsAlert alert = new LimitsAlert(configList);
 			Boolean shouldAlert = alert.shouldAlert();
 		Test.stopTest();
 
@@ -32,10 +62,18 @@ private class LimitsAlertTest
 		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
 			responseBody, responseHeaders);
 		
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
+
 		// When
 		Test.startTest();
 			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert();
+			LimitsAlert alert = new LimitsAlert(configList);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -59,10 +97,18 @@ private class LimitsAlertTest
 		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
 			responseBody, responseHeaders);
 		
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
+
 		// When
 		Test.startTest();
 			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert();
+			LimitsAlert alert = new LimitsAlert(configList);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -85,11 +131,19 @@ private class LimitsAlertTest
 		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
 		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
 			responseBody, responseHeaders);
+
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
 		
 		// When
 		Test.startTest();
 			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert();
+			LimitsAlert alert = new LimitsAlert(configList);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -115,25 +169,125 @@ private class LimitsAlertTest
 	}
 
 	@isTest
-	static void itShouldAlertHighWhenAPIFails()
+	static void itShouldUseCustomAlerts()
 	{
 		// Given
+		final String responseBody = getLimitsBody('15000', '2500');
 		final Map<String, String> responseHeaders = new Map<String, String>();
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(500, 'Internal Server Error',
-			null, responseHeaders);
+		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
+			responseBody, responseHeaders);
 		
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
+
+		Config__mdt dailyBulkAPIRequests = new Config__mdt();
+		dailyBulkAPIRequests.DeveloperName = 'DailyBulkApiRequests';
+		dailyBulkApiRequests.MasterLabel = 'DailyBulkApiRequests';
+		dailyBulkAPIRequests.Warning__c = 0.2;
+		dailyBulkAPIRequests.Severe__c = 0.9;
+		configList.add(dailyBulkAPIRequests);
+
 		// When
 		Test.startTest();
 			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert();
+			LimitsAlert alert = new LimitsAlert(configList);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
 
 		// Then
 		System.assert(shouldAlert == true);
-		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH);
-		System.assert(messages.get(0).message.contains(LimitsAlert.LIMIT_EXCEPTION_BASE_MSG));
+		System.assert(messages.size() == 1);
+		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM);
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 2500'));
+	}
+
+	@isTest
+	static void itShouldUseCustomAlertsWith100PctUsage()
+	{
+		// Given
+		final String responseBody = getLimitsBody('15000', '0');
+		final Map<String, String> responseHeaders = new Map<String, String>();
+		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
+			responseBody, responseHeaders);
+		
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
+
+		Config__mdt dailyBulkAPIRequests = new Config__mdt();
+		dailyBulkAPIRequests.DeveloperName = 'DailyBulkApiRequests';
+		dailyBulkApiRequests.MasterLabel = 'DailyBulkApiRequests';
+		dailyBulkAPIRequests.Warning__c = 1;
+		dailyBulkAPIRequests.Severe__c = 1.2;
+		configList.add(dailyBulkAPIRequests);
+
+		// When
+		Test.startTest();
+			Test.setMock(HttpCalloutMock.class, mock);
+			LimitsAlert alert = new LimitsAlert(configList);
+			Boolean shouldAlert = alert.shouldAlert();
+			List<AlertMessage> messages = alert.getMessages();
+		Test.stopTest();
+
+		// Then
+		System.assert(shouldAlert == true);
+		System.assert(messages.size() == 1);
+		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM);
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'));
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 0'));
+	}
+
+	@isTest
+	static void itShouldUseCustomAlertsWithMoreThan100PctUsage()
+	{
+		// Given
+		final String responseBody = getLimitsBody('15000', '-20');
+		final Map<String, String> responseHeaders = new Map<String, String>();
+		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
+			responseBody, responseHeaders);
+		
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
+
+		Config__mdt dailyBulkAPIRequests = new Config__mdt();
+		dailyBulkAPIRequests.DeveloperName = 'DailyBulkApiRequests';
+		dailyBulkApiRequests.MasterLabel = 'DailyBulkApiRequests';
+		dailyBulkAPIRequests.Warning__c = 1.5;
+		dailyBulkAPIRequests.Severe__c = 2.0;
+		configList.add(dailyBulkAPIRequests);
+
+		// When
+		Test.startTest();
+			Test.setMock(HttpCalloutMock.class, mock);
+			LimitsAlert alert = new LimitsAlert(configList);
+			Boolean shouldAlert = alert.shouldAlert();
+			List<AlertMessage> messages = alert.getMessages();
+		Test.stopTest();
+
+		// Then
+		System.assert(shouldAlert == false);
+		System.assert(messages.isEmpty());
 	}
 
 	static String getLimitsBody(String apiCount, String bulkApiCount) {

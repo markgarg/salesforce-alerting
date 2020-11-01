@@ -4,7 +4,7 @@ A simple alerting mechanism for Salesforce.com, with a sample Slack integration.
 ## Limits Alerts
 This class uses a sample alert mechanism for sending a message to a Slack channel when Salesforce Governor Limits are breached or nearing.
 
-At the moment, these are hardcoded to alert with a MEDIUM alert when 70% of a limit is reached and a HIGH alert at 90% or more. Further iterations will move these to a Custom Metadata Type.
+The limit levels can be set in the custom metadata `Config__mdt`. A default value of 70% for `WARNING` and 90% for `SEVERE` messages is already configured in the metadata with the name `All`. If a particular limit needs to be changed, a new metadata record can be introduced with that name. For example, if storage space is already at 85% and you'd like to be alerted only at 95% and 99% for warning and severe messages, respectively, then you'd need to add a new custom metadata record for `Config__mdt`. The key would be `DataStorageMB` (same as what the API returns), and values would be correspondingly configured. This is also present as an example record in the `customMetadata` directory.
 
 There are interfaces for `Alert` and `AlertInvoker` so custom alerts can easily be built.
 

@@ -1,32 +1,28 @@
 public without sharing class SlackAlertInvoker implements AlertInvoker {
-	public void invokeAlert(List<AlertMessage> alertMessages) {
-		Config__mdt slackConfig = getSlackConfig();
-		SlackAlertRequestBody reqBody = buildRequestBody(slackConfig, alertMessages);
+	public static final String TEMPLATE = '```Severity: {0}\n{1}```';
 
-		CalloutHelper.makeHTTPCallout(slackConfig.Alert_URL__c, 'POST',
+	public void invokeAlert(List<AlertMessage> alertMessages) {
+		String slackUrl = System.Label.SLACK_URL;
+		SlackAlertRequestBody reqBody = buildRequestBody(alertMessages);
+
+		CalloutHelper.makeHTTPCallout(slackUrl, 'POST',
 		                              null, JSON.serialize(reqBody));
 	}
 
-	private Config__mdt getSlackConfig() {
-		return [SELECT Id, Alert_URL__c, Channel_Name__c, Emoji_Icon__c,
-			        	Username__c
-			        FROM Config__mdt WHERE DeveloperName = 'Slack' LIMIT 1];
-	}
-
-	private SlackAlertRequestBody buildRequestBody(final Config__mdt slackConfig,
-			final List<AlertMessage> alertMessages) {
+	private SlackAlertRequestBody buildRequestBody(final List<AlertMessage> alertMessages) {
 		SlackAlertRequestBody reqBody = new SlackAlertRequestBody();
-		reqBody.channel = slackConfig.Channel_Name__c;
-		reqBody.username = slackConfig.Username__c;
-		reqBody.icon_emoji = slackConfig.Emoji_Icon__c;
+		reqBody.channel = System.Label.SLACK_CHANNEL_NAME;
+		reqBody.username = System.Label.SLACK_USERNAME;
+		reqBody.icon_emoji = System.Label.SLACK_EMOJI_ICON;
 
 		List<String> msgBody = new List<String>();
-		final String template = '```Severity: {0}\n{1}```';
 		for(AlertMessage am : alertMessages) {
-			msgBody.add(String.format(template, 
+			msgBody.add(String.format(TEMPLATE, 
 				new List<String>{am.level.name(), am.message}));
 		}
-		reqBody.text = String.join(msgBody, '\n');
+		String fullMessage = String.format('Alert: {0}',
+								new List<String>{String.join(msgBody, '\n')});
+		reqBody.text = fullMessage;
 
 		return reqBody;
 	}
@@ -37,4 +33,6 @@ public without sharing class SlackAlertInvoker implements AlertInvoker {
 		public String text {get; set;}
 		public String icon_emoji {get; set;}
 	}
+
+	public class AlertException extends Exception {}
 }

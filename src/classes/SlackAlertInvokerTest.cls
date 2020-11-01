@@ -1,18 +1,17 @@
 @isTest
-private class SlackAlertInvokerTest
-{
+private class SlackAlertInvokerTest {
 	@isTest
-	static void itShouldSendMessagesToSlack()
-	{
+	static void itShouldSendMessagesToSlack() {
 		// Given
 		AlertMessage am1 = new AlertMessage(AlertMessage.Severity.HIGH, 'Test 1');
 		AlertMessage am2 = new AlertMessage(AlertMessage.Severity.MEDIUM, 'Test 2');
-		
+
 		final Map<String, String> responseHeaders = new Map<String, String>();
 		responseHeaders.put('Content-Type', 'text/html');
-		
+
 		List<String> bodyContainsAsserts = new List<String>();
-		bodyContainsAsserts.add('"channel":"#crm-alert-dev"');
+		bodyContainsAsserts.add('Alert:');
+		bodyContainsAsserts.add('"channel":"#test-channel"');
 		bodyContainsAsserts.add('"username":"salesforcebot"');
 		bodyContainsAsserts.add('"icon_emoji":":salesforce:"');
 		bodyContainsAsserts.add('Test 1');
@@ -24,9 +23,11 @@ private class SlackAlertInvokerTest
 
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			SlackAlertInvoker invoker = new SlackAlertInvoker();
-			invoker.invokeAlert(new List<AlertMessage>{am1, am2});
+		Test.setMock(HttpCalloutMock.class, mock);
+		SlackAlertInvoker invoker = new SlackAlertInvoker();
+		invoker.invokeAlert(
+			new List<AlertMessage>{am1, am2}
+		);
 		Test.stopTest();
 	}
 }

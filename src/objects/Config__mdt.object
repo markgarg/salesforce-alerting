@@ -2,51 +2,41 @@
 <CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Configuration for alerts</description>
     <fields>
-        <fullName>Alert_URL__c</fullName>
-        <description>Alert URL endpoint</description>
-        <externalId>false</externalId>
-        <fieldManageability>SubscriberControlled</fieldManageability>
-        <label>Alert URL</label>
-        <required>false</required>
-        <type>Url</type>
-    </fields>
-    <fields>
-        <fullName>Channel_Name__c</fullName>
-        <description>The slack channel where alerts should be sent e.g., #alerts</description>
+        <fullName>Severe__c</fullName>
+        <description>Expressed in decimals (0.1 for 10%), when this % is reached/crossed, raise a SEVERE event</description>
         <externalId>false</externalId>
         <fieldManageability>DeveloperControlled</fieldManageability>
-        <inlineHelpText>The slack channel where alerts should be sent e.g., #alerts</inlineHelpText>
-        <label>Channel Name</label>
-        <length>50</length>
+        <inlineHelpText>Expressed in decimals (0.1 for 10%), when this % is reached/crossed, raise a SEVERE event</inlineHelpText>
+        <label>Severe %</label>
+        <precision>5</precision>
         <required>false</required>
-        <type>Text</type>
+        <scale>2</scale>
+        <type>Number</type>
         <unique>false</unique>
     </fields>
     <fields>
-        <fullName>Emoji_Icon__c</fullName>
-        <description>Emoji to use as icon for slack message e.g., :smiley:</description>
+        <fullName>Warning__c</fullName>
+        <description>Expressed in decimals (0.1 for 10%), when this % is reached/crossed, raise a WARNING event</description>
         <externalId>false</externalId>
         <fieldManageability>DeveloperControlled</fieldManageability>
-        <inlineHelpText>Emoji to use as icon for slack message e.g., :smiley:</inlineHelpText>
-        <label>Emoji Icon</label>
-        <length>50</length>
+        <inlineHelpText>Expressed in decimals (0.1 for 10%), when this % is reached/crossed, raise a WARNING event</inlineHelpText>
+        <label>Warning %</label>
+        <precision>5</precision>
         <required>false</required>
-        <type>Text</type>
+        <scale>2</scale>
+        <type>Number</type>
         <unique>false</unique>
     </fields>
-    <fields>
-        <fullName>Username__c</fullName>
-        <description>Username of the user the alert will be sent as e.g., salesforcebot</description>
-        <externalId>false</externalId>
-        <fieldManageability>DeveloperControlled</fieldManageability>
-        <inlineHelpText>Username of the user the alert will be sent as e.g., salesforcebot</inlineHelpText>
-        <label>Username</label>
-        <length>50</length>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <label>Config</label>
-    <pluralLabel>Configs</pluralLabel>
+    <label>Monitoring Config</label>
+    <listViews>
+        <fullName>All</fullName>
+        <columns>MasterLabel</columns>
+        <columns>Warning__c</columns>
+        <columns>Severe__c</columns>
+        <filterScope>Everything</filterScope>
+        <label>All</label>
+        <language>en_US</language>
+    </listViews>
+    <pluralLabel>Monitoring Config</pluralLabel>
     <visibility>Public</visibility>
 </CustomObject>

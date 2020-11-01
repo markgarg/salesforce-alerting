@@ -1,20 +1,15 @@
 public without sharing class LimitsAlert implements Alert {
-	private List<AlertMessage> alertMessages;
-	public static final String LIMIT_EXCEPTION_BASE_MSG = 'Something wrong with Limits API:';
+	private LimitsAlertHelper helper;
+
+	public LimitsAlert(List<Config__mdt> monitoringConfig) {
+		helper = new LimitsAlertHelper(monitoringConfig);
+	}
 
 	public Boolean shouldAlert() {
-		try {
-			alertMessages = LimitsAlertHelper.getAlerts();
-		} catch(Exception ex) {
-			AlertMessage alert = new AlertMessage(AlertMessage.Severity.HIGH,
-				 LIMIT_EXCEPTION_BASE_MSG + ex.getMessage());
-			alertMessages = new List<AlertMessage>();
-			alertMessages.add(alert);
-		}
-		return !alertMessages.isEmpty();
+		return helper.areThereAnyAlerts();
 	}
 
 	public List<AlertMessage> getMessages() {
-		return alertMessages;
+		return helper.alerts;
 	}	
 }
