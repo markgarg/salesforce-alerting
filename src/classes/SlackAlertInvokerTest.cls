@@ -10,7 +10,7 @@ private class SlackAlertInvokerTest {
 		responseHeaders.put('Content-Type', 'text/html');
 
 		List<String> bodyContainsAsserts = new List<String>();
-		bodyContainsAsserts.add('Alert for :');
+		bodyContainsAsserts.add('Alert:');
 		bodyContainsAsserts.add('"channel":"#test-channel"');
 		bodyContainsAsserts.add('"username":"salesforcebot"');
 		bodyContainsAsserts.add('"icon_emoji":":salesforce:"');

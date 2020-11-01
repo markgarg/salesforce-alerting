@@ -25,7 +25,7 @@
         <fullName>SLACK_EMOJI_ICON</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Emoji name for icon to be shown for the slack user. You'll have to upload an emoji with this name, if it doesn't already exist.</shortDescription>
+        <shortDescription>Emoji name for icon to be shown for the slack user</shortDescription>
         <value>:salesforce:</value>
     </labels>
 </CustomLabels>
