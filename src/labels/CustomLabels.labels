@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>SLACK_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>URL for your slack service</shortDescription>
+        <value>https://hooks.slack.com/services</value>
+    </labels>
+    <labels>
+        <fullName>SLACK_CHANNEL_NAME</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Which channel you'd like to send the slack message to?</shortDescription>
+        <value>#test-channel</value>
+    </labels>
+    <labels>
+        <fullName>SLACK_USERNAME</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Username you'd want to show for the slack message</shortDescription>
+        <value>salesforcebot</value>
+    </labels>
+    <labels>
+        <fullName>SLACK_EMOJI_ICON</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Emoji name for icon to be shown for the slack user. You'll have to upload an emoji with this name, if it doesn't already exist.</shortDescription>
+        <value>:salesforce:</value>
+    </labels>
+</CustomLabels>
