@@ -11,14 +11,14 @@
         <fullName>SLACK_CHANNEL_NAME</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Which channel you'd like to send the slack message to?</shortDescription>
+        <shortDescription>Which channel you&apos;d like to send the slack message to?</shortDescription>
         <value>#test-channel</value>
     </labels>
     <labels>
         <fullName>SLACK_USERNAME</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Username you'd want to show for the slack message</shortDescription>
+        <shortDescription>Username you&apos;d want to show for the slack message</shortDescription>
         <value>salesforcebot</value>
     </labels>
     <labels>
