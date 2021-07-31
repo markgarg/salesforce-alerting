@@ -6,7 +6,7 @@ global class AlertManagerSchedulable implements BaseScheduler.ISchedule {
 			LIMIT 1000
 		];
 		Alert limitsAlert = new LimitsAlert(monitoringConfig);
-		if(limitsAlert.shouldAlert()){
+		if (limitsAlert.shouldAlert()) {
 			AlertInvoker slack = new SlackAlertInvoker();
 			slack.invokeAlert(limitsAlert.getMessages());
 		}

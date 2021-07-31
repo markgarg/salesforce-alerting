@@ -1,7 +1,10 @@
 public without sharing class LimitsAlert implements Alert {
 	private LimitsAlertHelper helper;
 
-	public LimitsAlert(List<Config__mdt> monitoringConfig, ILimitsService limitsService) {
+	public LimitsAlert(
+		List<Config__mdt> monitoringConfig,
+		ILimitsService limitsService
+	) {
 		helper = new LimitsAlertHelper(monitoringConfig, limitsService);
 	}
 
@@ -11,6 +14,5 @@ public without sharing class LimitsAlert implements Alert {
 
 	public List<AlertMessage> getMessages() {
 		return helper.alerts;
-	}	
+	}
 }
-

@@ -1,8 +1,6 @@
 // Follows design pattern from http://advancedapex.com/2012/11/14/scheduledapex/
 // so that Scheduled job implementation can change
-global class BaseScheduler implements Schedulable, Database.Batchable<sObject>,
-		Database.AllowsCallouts {
-	
+global class BaseScheduler implements Schedulable, Database.Batchable<sObject>, Database.AllowsCallouts {
 	private SchedulableContext sc;
 
 	global BaseScheduler() {
@@ -24,8 +22,8 @@ global class BaseScheduler implements Schedulable, Database.Batchable<sObject>,
 	// The batch doesn't do anything.
 	global Database.QueryLocator start(Database.BatchableContext bc) {
 		Type targettype = Type.forName('AlertManagerSchedulable');
-		if(targettype != null) {
-			ISchedule obj = (ISchedule)targettype.newInstance();
+		if (targettype != null) {
+			ISchedule obj = (ISchedule) targettype.newInstance();
 			obj.execute(sc);
 		}
 
@@ -33,6 +31,8 @@ global class BaseScheduler implements Schedulable, Database.Batchable<sObject>,
 		return Database.getQueryLocator('SELECT Id FROM Account LIMIT 1');
 	}
 
-	global void execute(Database.BatchableContext bc, List<sObject> unused) {}
-	global void finish(Database.BatchableContext bc) {}
+	global void execute(Database.BatchableContext bc, List<sObject> unused) {
+	}
+	global void finish(Database.BatchableContext bc) {
+	}
 }
