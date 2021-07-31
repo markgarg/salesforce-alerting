@@ -1,18 +1,17 @@
 public without sharing class LimitsAlertHelper {
-	public static final String API_VERSION = 'v44.0';
-	public static final String URL_PATH = 'callout:{0}/services/data/{1}/limits';
-	public static final String NAMED_CREDENTIAL = 'InternalRestAPI';
 	public static final String LIMIT_EXCEPTION_BASE_MSG = 'Something wrong with Limits API:';
 	public static final String KEY_GLOBAL_CONFIG = 'All';
 
 	public List<AlertMessage> alerts {get; private set;}
 	private Map<String, Config__mdt> monitoringConfigMap;
+	private ILimitsService limitsService;
 
-	public LimitsAlertHelper(List<Config__mdt> monitoringConfig) {
-		monitoringConfigMap = new Map<String, Config__mdt>();
+	public LimitsAlertHelper(List<Config__mdt> monitoringConfig, ILimitsService limitsService) {
+		this.limitsService = limitsService;
+		this.monitoringConfigMap = new Map<String, Config__mdt>();
 		if(monitoringConfig != null) {
 			for(Config__mdt config : monitoringConfig) {
-				monitoringConfigMap.put(config.MasterLabel, config);
+				this.monitoringConfigMap.put(config.MasterLabel, config);
 			}
 		}
 		this.checkForAlerts();
@@ -24,8 +23,8 @@ public without sharing class LimitsAlertHelper {
 
 	public void checkForAlerts() {
 		try {
-			Map<String, Object> limitsMap = getLimits();
-			List<LimitItem> breachedLimits = evaluateLimitBreach(limitsMap);
+			List<LimitItem> allLimits = this.limitsService.getLimits();
+			List<LimitItemWithSeverity> breachedLimits = evaluateLimitBreach(allLimits);
 			this.alerts = getAlertMessagesFor(breachedLimits);
 		} catch(Exception ex) {
 			AlertMessage alert = new AlertMessage(AlertMessage.Severity.HIGH,
@@ -35,57 +34,41 @@ public without sharing class LimitsAlertHelper {
 		}
 	}
 
-	private Map<String, Object> getLimits() {
-		final String path = String.format(URL_PATH,
-		                                  new List<String> {NAMED_CREDENTIAL, API_VERSION});
-		final String response = CalloutHelper.makeHTTPCallout(path, 'GET', null, null);
-		Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(response);
-
-		return responseMap;
-	}
-
-	private List<LimitItem> evaluateLimitBreach(Map<String, Object> limitsMap) {
-		List<LimitItem> limitItems = new List<LimitItem>();
+	private List<LimitItemWithSeverity> evaluateLimitBreach(List<LimitItem> allLimits) {
+		List<LimitItemWithSeverity> limitItemsWithSeverity = new List<LimitItemWithSeverity>();
 		Config__mdt globalConfig = monitoringConfigMap.get(KEY_GLOBAL_CONFIG);
-		for(String key : limitsMap.keyset()) {
-			Map<String, Object> limitResults = (Map<String, Object>) limitsMap.get(key);
-			final Integer max = (Integer) limitResults.get('Max');
-			final Integer remaining = (Integer) limitResults.get('Remaining');
-
-			if (max == 0) {
+		for(LimitItem li : allLimits) {
+			if (li.max == 0) {
 				// the limit is not configured for the Org, so skip it
 				continue;
 			}
 			
 			Decimal warningPct = 1 - globalConfig.Warning__c;
 			Decimal severePct = 1 - globalConfig.Severe__c;
-			if(monitoringConfigMap.containsKey(key)) {
-				warningPct = 1 - monitoringConfigMap.get(key).Warning__c;
-				severePct = 1 - monitoringConfigMap.get(key).Severe__c;
+			if(monitoringConfigMap.containsKey(li.key)) {
+				warningPct = 1 - monitoringConfigMap.get(li.key).Warning__c;
+				severePct = 1 - monitoringConfigMap.get(li.key).Severe__c;
 			}
 
-			LimitItem li = new LimitItem();
-			li.key = key;
-			li.max = max;
-			li.remaining = remaining;
-			if(remaining > max || (remaining <= severePct * max)) {
+			LimitItemWithSeverity liWithSeverity = new LimitItemWithSeverity(li);
+			if(li.remaining > li.max || (li.remaining <= severePct * li.max)) {
 				// SEVERE
-				li.severityLevel = AlertMessage.Severity.HIGH;
-				limitItems.add(li);
-			} else if(remaining <= warningPct * max) {
+				liWithSeverity.severityLevel = AlertMessage.Severity.HIGH;
+				limitItemsWithSeverity.add(liWithSeverity);
+			} else if(li.remaining <= warningPct * li.max) {
 				// WARNING
-				li.severityLevel = AlertMessage.Severity.MEDIUM;
-				limitItems.add(li);
+				liWithSeverity.severityLevel = AlertMessage.Severity.MEDIUM;
+				limitItemsWithSeverity.add(liWithSeverity);
 			}
 		}
-		return limitItems;
+		return limitItemsWithSeverity;
 	}
 
-	private List<AlertMessage> getAlertMessagesFor(List<LimitItem> limitItems) {
+	private List<AlertMessage> getAlertMessagesFor(List<LimitItemWithSeverity> limitItemsWithSeverity) {
 		List<AlertMessage> alertMessages = new List<AlertMessage>();
-		for(LimitItem li : limitItems) {
-			final String msg = buildMessage(li.key, li.max, li.remaining);
-			alertMessages.add(new AlertMessage(li.severityLevel, msg));
+		for(LimitItemWithSeverity liWithSeverity : limitItemsWithSeverity) {
+			final String msg = buildMessage(liWithSeverity.limitItem.key, liWithSeverity.limitItem.max, liWithSeverity.limitItem.remaining);
+			alertMessages.add(new AlertMessage(liWithSeverity.severityLevel, msg));
 		}
 		return alertMessages;
 	}
@@ -98,10 +81,12 @@ public without sharing class LimitsAlertHelper {
 		return msg;
 	}
 
-	public class LimitItem {
-		public String key {get; set;}
-		public AlertMessage.Severity severityLevel {get; set;}
-		public Integer max {get; set;}
-		public Integer remaining {get; set;}
+	public class LimitItemWithSeverity {
+		public LimitItem limitItem;
+		public AlertMessage.Severity severityLevel;
+		
+		public LimitItemWithSeverity(LimitItem limitItem) {
+			this.limitItem = limitItem;
+		}
 	}
 }
