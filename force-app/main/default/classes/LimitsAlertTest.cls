@@ -4,36 +4,10 @@
 private class LimitsAlertTest
 {
 	@isTest
-	static void itShouldAlertHighWhenAPIFails()
-	{
-		// Given
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(500, 'Internal Server Error',
-			null, responseHeaders);
-		
-		// When
-		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(null);
-			Boolean shouldAlert = alert.shouldAlert();
-			List<AlertMessage> messages = alert.getMessages();
-		Test.stopTest();
-
-		// Then
-		System.assert(shouldAlert == true, 'should raise an alert');
-		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH, 'should raise alert with HIGH severity');
-		System.assert(messages.get(0).message.contains(LimitsAlertHelper.LIMIT_EXCEPTION_BASE_MSG), 'should raise alert with matching message');
-	}
-
-	@isTest
 	static void itShouldNotAlertWhenThereIsNoProblem()
 	{
 		// Given
-		final String responseBody = getLimitsBody('15000', '5000');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(15000, 5000);
 		
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -43,10 +17,11 @@ private class LimitsAlertTest
 		all.Severe__c = 0.9;
 		configList.add(all);
 
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
+
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 		Test.stopTest();
 
@@ -58,11 +33,7 @@ private class LimitsAlertTest
 	static void itShouldAlertWithMediumWhenThereIsASmallProblem()
 	{
 		// Given
-		final String responseBody = getLimitsBody('3000', '5000');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(3000, 5000);
 		
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -72,10 +43,11 @@ private class LimitsAlertTest
 		all.Severe__c = 0.9;
 		configList.add(all);
 
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
+
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -93,11 +65,7 @@ private class LimitsAlertTest
 	static void itShouldAlertWithHighWhenThereIsABigProblem()
 	{
 		// Given
-		final String responseBody = getLimitsBody('15000', '20');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(15000, 20);
 		
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -107,10 +75,11 @@ private class LimitsAlertTest
 		all.Severe__c = 0.9;
 		configList.add(all);
 
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
+
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -128,11 +97,7 @@ private class LimitsAlertTest
 	static void itShouldAlertWithHighWhenThereAreBigProblems()
 	{
 		// Given
-		final String responseBody = getLimitsBody('200', '20');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(200, 20);
 
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -141,11 +106,12 @@ private class LimitsAlertTest
 		all.Warning__c = 0.7;
 		all.Severe__c = 0.9;
 		configList.add(all);
+
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
 		
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -175,11 +141,7 @@ private class LimitsAlertTest
 	static void itShouldUseCustomAlerts()
 	{
 		// Given
-		final String responseBody = getLimitsBody('15000', '2500');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(15000, 2500);
 		
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -196,10 +158,11 @@ private class LimitsAlertTest
 		dailyBulkAPIRequests.Severe__c = 0.9;
 		configList.add(dailyBulkAPIRequests);
 
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
+
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -217,11 +180,7 @@ private class LimitsAlertTest
 	static void itShouldUseCustomAlertsWith100PctUsage()
 	{
 		// Given
-		final String responseBody = getLimitsBody('15000', '0');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(15000, 0);
 		
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -238,10 +197,11 @@ private class LimitsAlertTest
 		dailyBulkAPIRequests.Severe__c = 1.2;
 		configList.add(dailyBulkAPIRequests);
 
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
+
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -259,11 +219,7 @@ private class LimitsAlertTest
 	static void itShouldUseCustomAlertsWithMoreThan100PctUsage()
 	{
 		// Given
-		final String responseBody = getLimitsBody('15000', '-20');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(15000, -20);
 		
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -280,10 +236,11 @@ private class LimitsAlertTest
 		dailyBulkAPIRequests.Severe__c = 2.0;
 		configList.add(dailyBulkAPIRequests);
 
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
+
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -298,11 +255,7 @@ private class LimitsAlertTest
 	{
 		// When limit is not configured for org, the max value is 0
 		// Given
-		final String responseBody = getLimitsBody('15000', '15000', '0', '0');
-		final Map<String, String> responseHeaders = new Map<String, String>();
-		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
-		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
-			responseBody, responseHeaders);
+		final List<LimitItem> limitsStubbedResults = getLimitItems(0, 0, 0, 0);
 		
 		List<Config__mdt> configList = new List<Config__mdt>();
 		Config__mdt all = new Config__mdt();
@@ -312,10 +265,11 @@ private class LimitsAlertTest
 		all.Severe__c = 0.9;
 		configList.add(all);
 
+		LimitsServiceStub stub = new LimitsServiceStub(limitsStubbedResults);
+
 		// When
 		Test.startTest();
-			Test.setMock(HttpCalloutMock.class, mock);
-			LimitsAlert alert = new LimitsAlert(configList);
+			LimitsAlert alert = new LimitsAlert(configList, stub);
 			Boolean shouldAlert = alert.shouldAlert();
 			List<AlertMessage> messages = alert.getMessages();
 		Test.stopTest();
@@ -325,101 +279,23 @@ private class LimitsAlertTest
 		System.assert(messages.isEmpty(), 'no alert messages should be generated');
 	}
 
-	static String getLimitsBody(String remainingAPICount, String remainingBulkAPICount) {
-		return getLimitsBody(remainingAPICount, '15000', remainingBulkAPICount, '5000');
+	static List<LimitItem> getLimitItems(Integer remainingAPICount, Integer remainingBulkAPICount) {
+		return getLimitItems(remainingAPICount, 15000, remainingBulkAPICount, 5000);
 	}
 
-	static String getLimitsBody(String remainingAPICount, 
-		String maxAPICount, 
-		String remainingBulkAPICount, 
-		String maxBulkAPICount) 
+	static List<LimitItem> getLimitItems(Integer remainingAPICount, 
+		Integer maxAPICount, 
+		Integer remainingBulkAPICount, 
+		Integer maxBulkAPICount) 
 	{
-        // prettier-ignore
-		return '{'
-				+'  "ConcurrentAsyncGetReportInstances": {'
-				+'    "Max": 200,'
-				+'    "Remaining": 200'
-				+'  },'
-				+'  "ConcurrentSyncReportRuns": {'
-				+'    "Max": 20,'
-				+'    "Remaining": 20'
-				+'  },'
-				+'  "DailyApiRequests": {'
-				+'    "Max": ' + maxAPICount + ','
-				+'    "Remaining": ' + remainingAPICount + ''
-				+'  },'
-				+'  "DailyAsyncApexExecutions": {'
-				+'    "Max": 250000,'
-				+'    "Remaining": 250000'
-				+'  },'
-				+'  "DailyBulkApiRequests": {'
-				+'    "Max": ' + maxBulkAPICount + ','
-				+'    "Remaining": ' + remainingBulkAPICount + ''
-				+'  },'
-				+'  "DailyDurableGenericStreamingApiEvents": {'
-				+'    "Max": 10000,'
-				+'    "Remaining": 10000'
-				+'  },'
-				+'  "DailyDurableStreamingApiEvents": {'
-				+'    "Max": 10000,'
-				+'    "Remaining": 10000'
-				+'  },'
-				+'  "DailyWorkflowEmails": {'
-				+'    "Max": 390,'
-				+'    "Remaining": 390'
-				+'  },'
-				+'  "DataStorageMB": {'
-				+'    "Max": 5,'
-				+'    "Remaining": 5'
-				+'  },'
-				+'  "DurableStreamingApiConcurrentClients": {'
-				+'    "Max": 20,'
-				+'    "Remaining": 20'
-				+'  },'
-				+'  "FileStorageMB": {'
-				+'    "Max": 20,'
-				+'    "Remaining": 20'
-				+'  },'
-				+'  "HourlyAsyncReportRuns": {'
-				+'    "Max": 1200,'
-				+'    "Remaining": 1200'
-				+'  },'
-				+'  "HourlyDashboardRefreshes": {'
-				+'    "Max": 200,'
-				+'    "Remaining": 200'
-				+'  },'
-				+'  "HourlyDashboardResults": {'
-				+'    "Max": 5000,'
-				+'    "Remaining": 5000'
-				+'  },'
-				+'  "HourlyDashboardStatuses": {'
-				+'    "Max": 999999999,'
-				+'    "Remaining": 999999999'
-				+'  },'
-				+'  "HourlyODataCallout": {'
-				+'    "Remaining": 9999,'
-				+'    "Max": 10000'
-				+'  },'
-				+'  "HourlySyncReportRuns": {'
-				+'    "Max": 500,'
-				+'    "Remaining": 500'
-				+'  },'
-				+'  "HourlyTimeBasedWorkflow": {'
-				+'    "Max": 50,'
-				+'    "Remaining": 50'
-				+'  },'
-				+'  "MassEmail": {'
-				+'    "Max": 10,'
-				+'    "Remaining": 10'
-				+'  },'
-				+'  "MonthlyPlatformEvents": {'
-				+'    "Max": 300000,'
-				+'    "Remaining": 300000'
-				+'  },'
-				+'  "SingleEmail": {'
-				+'    "Max": 15,'
-				+'    "Remaining": 15'
-				+'  }'
-				+'}';
+		List<LimitItem> limits = new List<LimitItem>();
+		limits.add(new LimitItem('ConcurrentAsyncGetReportInstances', 200, 200));
+		limits.add(new LimitItem('ConcurrentSyncReportRuns', 20, 20));
+		limits.add(new LimitItem('DailyApiRequests', maxAPICount, remainingAPICount));
+		limits.add(new LimitItem('DailyAsyncApexExecutions', 25000, 25000));
+		limits.add(new LimitItem('DailyBulkApiRequests', maxBulkAPICount, remainingBulkAPICount));
+		limits.add(new LimitItem('DailyDurableGenericStreamingApiEvents', 10000, 10000));
+		limits.add(new LimitItem('DailyDurableStreamingApiEvents', 10000, 10000));
+		return limits;
 	}
 }

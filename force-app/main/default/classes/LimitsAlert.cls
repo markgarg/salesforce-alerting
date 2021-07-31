@@ -1,8 +1,8 @@
 public without sharing class LimitsAlert implements Alert {
 	private LimitsAlertHelper helper;
 
-	public LimitsAlert(List<Config__mdt> monitoringConfig) {
-		helper = new LimitsAlertHelper(monitoringConfig);
+	public LimitsAlert(List<Config__mdt> monitoringConfig, ILimitsService limitsService) {
+		helper = new LimitsAlertHelper(monitoringConfig, limitsService);
 	}
 
 	public Boolean shouldAlert() {
@@ -13,3 +13,4 @@ public without sharing class LimitsAlert implements Alert {
 		return helper.alerts;
 	}	
 }
+
