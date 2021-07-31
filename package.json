@@ -1,8 +1,13 @@
 {
-  "name": "salesforce-app",
+  "name": "salesforce-alerting",
   "private": true,
   "version": "1.0.0",
-  "description": "Salesforce App",
+  "description": "Simple Slack alerts for Salesforce",
+  "author": "Rohit Macherla <rohit.macherla@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markgarg/salesforce-alerting"
+  },
   "scripts": {
     "lint": "npm run lint:lwc && npm run lint:aura",
     "lint:aura": "eslint **/aura/**",
