@@ -52,6 +52,11 @@ public without sharing class LimitsAlertHelper {
 			final Integer max = (Integer) limitResults.get('Max');
 			final Integer remaining = (Integer) limitResults.get('Remaining');
 
+			if (max == 0) {
+				// the limit is not configured for the Org, so skip it
+				continue;
+			}
+			
 			Decimal warningPct = 1 - globalConfig.Warning__c;
 			Decimal severePct = 1 - globalConfig.Severe__c;
 			if(monitoringConfigMap.containsKey(key)) {
