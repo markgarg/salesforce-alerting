@@ -1,3 +1,5 @@
+
+@SuppressWarnings('PMD.ExcessiveParameterList')
 @isTest
 private class LimitsAlertTest
 {
@@ -18,9 +20,9 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == true);
-		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH);
-		System.assert(messages.get(0).message.contains(LimitsAlertHelper.LIMIT_EXCEPTION_BASE_MSG));
+		System.assert(shouldAlert == true, 'should raise an alert');
+		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH, 'should raise alert with HIGH severity');
+		System.assert(messages.get(0).message.contains(LimitsAlertHelper.LIMIT_EXCEPTION_BASE_MSG), 'should raise alert with matching message');
 	}
 
 	@isTest
@@ -49,7 +51,7 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == false);
+		System.assert(shouldAlert == false, 'should not alert when there is no problem');
 	}
 
 	@isTest
@@ -79,12 +81,12 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == true);
-		System.assert(messages.size() == 1);
-		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM);
-		System.assert(messages.get(0).message.containsIgnoreCase('DailyApiRequests'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 15000'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 3000'));
+		System.assert(shouldAlert == true, 'should raise an alert');
+		System.assert(messages.size() == 1, 'should contain only 1 message in the alert');
+		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM, 'alert level should match');
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyApiRequests'), 'alert should be for api requests');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 15000'), 'max value should be 15000');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 3000'), 'remaining should be 3000');
 	}
 
 	@isTest
@@ -114,12 +116,12 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == true);
-		System.assert(messages.size() == 1);
-		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH);
-		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 20'));
+		System.assert(shouldAlert == true, 'should raise an alert');
+		System.assert(messages.size() == 1, 'should contain only 1 message in the alert');
+		System.assert(messages.get(0).level == AlertMessage.Severity.HIGH, 'alert level should match');
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'), 'alert should be for bulk api requests');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'), 'max value should be 5000');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 20'), 'remaining should be 20');
 	}
 
 	@isTest
@@ -149,23 +151,24 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == true);
-		System.assert(messages.size() == 2);
-		Boolean hasApi = false, hasBulkApi = false;
+		System.assert(shouldAlert == true, 'should raise an alert');
+		System.assert(messages.size() == 2, 'should contain 2 messages in the alert');
+		Boolean hasApi = false;
+		Boolean hasBulkApi = false;
 		for(AlertMessage am : messages) {
 			if (am.message.containsIgnoreCase('DailyApiRequests')){
 				hasApi = true;
-				System.assert(am.level == AlertMessage.Severity.HIGH);
-				System.assert(am.message.containsIgnoreCase('"Max": 15000'));
-				System.assert(am.message.containsIgnoreCase('"Remaining": 200'));
+				System.assert(am.level == AlertMessage.Severity.HIGH, 'alert level should match');
+				System.assert(am.message.containsIgnoreCase('"Max": 15000'), 'api max value should be 15000');
+				System.assert(am.message.containsIgnoreCase('"Remaining": 200'), 'api remaining value should be 200');
 			} else if (am.message.containsIgnoreCase('DailyBulkApiRequests')) {
 				hasBulkApi = true;
-				System.assert(am.level == AlertMessage.Severity.HIGH);
-				System.assert(am.message.containsIgnoreCase('"Max": 5000'));
-				System.assert(am.message.containsIgnoreCase('"Remaining": 20'));
+				System.assert(am.level == AlertMessage.Severity.HIGH, 'alert level should match');
+				System.assert(am.message.containsIgnoreCase('"Max": 5000'), 'bulk api max value should be 5000');
+				System.assert(am.message.containsIgnoreCase('"Remaining": 20'), 'bulk api remaining value should be 20');
 			}
 		}
-		System.assert(hasApi && hasBulkApi);
+		System.assert(hasApi && hasBulkApi, 'both api and bulk api should be present');
 	}
 
 	@isTest
@@ -202,12 +205,12 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == true);
-		System.assert(messages.size() == 1);
-		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM);
-		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 2500'));
+		System.assert(shouldAlert == true, 'should raise an alert');
+		System.assert(messages.size() == 1, 'should contain only 1 message in the alert');
+		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM, 'alert level should match');
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'), 'alert should be for bulk api requests');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'), 'max value should be 5000');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 2500'), 'remaining should be 2500');
 	}
 
 	@isTest
@@ -244,12 +247,12 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == true);
-		System.assert(messages.size() == 1);
-		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM);
-		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'));
-		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 0'));
+		System.assert(shouldAlert == true, 'should raise an alert');
+		System.assert(messages.size() == 1, 'should contain only 1 message in the alert');
+		System.assert(messages.get(0).level == AlertMessage.Severity.MEDIUM, 'alert level should match');
+		System.assert(messages.get(0).message.containsIgnoreCase('DailyBulkApiRequests'), 'alert should be for bulk api requests');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Max": 5000'), 'max value should be 5000');
+		System.assert(messages.get(0).message.containsIgnoreCase('"Remaining": 0'), 'remaining should be 0');
 	}
 
 	@isTest
@@ -286,11 +289,52 @@ private class LimitsAlertTest
 		Test.stopTest();
 
 		// Then
-		System.assert(shouldAlert == false);
-		System.assert(messages.isEmpty());
+		System.assert(shouldAlert == false, 'should not raise an alert when limits have not exceeded');
+		System.assert(messages.isEmpty(), 'no messages should be present');
 	}
 
-	static String getLimitsBody(String apiCount, String bulkApiCount) {
+	@isTest
+	static void itShouldNotAlertWhenLimitIsNotConfiguredForOrg()
+	{
+		// When limit is not configured for org, the max value is 0
+		// Given
+		final String responseBody = getLimitsBody('15000', '15000', '0', '0');
+		final Map<String, String> responseHeaders = new Map<String, String>();
+		responseHeaders.put('Content-Type', 'application/json;charset=UTF-8');
+		AlertHttpCalloutMock mock = new AlertHttpCalloutMock(200, 'OK',
+			responseBody, responseHeaders);
+		
+		List<Config__mdt> configList = new List<Config__mdt>();
+		Config__mdt all = new Config__mdt();
+		all.DeveloperName = 'All';
+		all.MasterLabel = 'All';
+		all.Warning__c = 0.7;
+		all.Severe__c = 0.9;
+		configList.add(all);
+
+		// When
+		Test.startTest();
+			Test.setMock(HttpCalloutMock.class, mock);
+			LimitsAlert alert = new LimitsAlert(configList);
+			Boolean shouldAlert = alert.shouldAlert();
+			List<AlertMessage> messages = alert.getMessages();
+		Test.stopTest();
+
+		// Then
+		System.assert(shouldAlert == false, 'should not alert because limit is not configured for org');
+		System.assert(messages.isEmpty(), 'no alert messages should be generated');
+	}
+
+	static String getLimitsBody(String remainingAPICount, String remainingBulkAPICount) {
+		return getLimitsBody(remainingAPICount, '15000', remainingBulkAPICount, '5000');
+	}
+
+	static String getLimitsBody(String remainingAPICount, 
+		String maxAPICount, 
+		String remainingBulkAPICount, 
+		String maxBulkAPICount) 
+	{
+        // prettier-ignore
 		return '{'
 				+'  "ConcurrentAsyncGetReportInstances": {'
 				+'    "Max": 200,'
@@ -301,16 +345,16 @@ private class LimitsAlertTest
 				+'    "Remaining": 20'
 				+'  },'
 				+'  "DailyApiRequests": {'
-				+'    "Max": 15000,'
-				+'    "Remaining": ' + apiCount + ''
+				+'    "Max": ' + maxAPICount + ','
+				+'    "Remaining": ' + remainingAPICount + ''
 				+'  },'
 				+'  "DailyAsyncApexExecutions": {'
 				+'    "Max": 250000,'
 				+'    "Remaining": 250000'
 				+'  },'
 				+'  "DailyBulkApiRequests": {'
-				+'    "Max": 5000,'
-				+'    "Remaining": ' + bulkApiCount + ''
+				+'    "Max": ' + maxBulkAPICount + ','
+				+'    "Remaining": ' + remainingBulkAPICount + ''
 				+'  },'
 				+'  "DailyDurableGenericStreamingApiEvents": {'
 				+'    "Max": 10000,'
