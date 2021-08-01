@@ -6,7 +6,9 @@ on:
     workflow_dispatch:
     pull_request:
         types: [opened, edited, synchronize, reopened]
-
+        paths-ignore:
+            - "sfdx-project.json"
+            - "README.md"
 # Jobs to be executed
 jobs:
     # Formatting
