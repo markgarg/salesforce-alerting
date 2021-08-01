@@ -1,6 +1,6 @@
 # Salesforce Alerting
 
-A simple alerting mechanism for Salesforce.com, with a sample Slack integration.
+A simple alerting mechanism for Salesforce.com, with a sample Slack integration. There's a [blog post here](https://rohitmacherla.com/slack-alerts-for-salesforce) to elaborate on this. It's also a part of the series I am writing about monitoring your Salesforce enterprise.
 
 ## Limits Alerts
 
