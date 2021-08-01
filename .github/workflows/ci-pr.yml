@@ -52,7 +52,7 @@ jobs:
 
     scratch-org-test:
         runs-on: ubuntu-latest
-        needs: formatting
+        needs: format-lint-lwc-tests
         steps:
             # Install Salesforce CLI
             - name: "Install Salesforce CLI"
