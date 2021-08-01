@@ -36,20 +36,6 @@ jobs:
             - name: "Code formatting verification with Prettier"
               run: npm run prettier:verify
 
-            # ESlint
-            - name: "Lint Project"
-              run: npm run lint
-
-            # LWC unit tests
-            - name: "Unit test Lightning Web Components"
-              run: npm run test:unit:coverage
-
-            # Upload code coverage data
-            - name: "Upload code coverage for LWC to Codecov.io"
-              uses: codecov/codecov-action@v1
-              with:
-                  flags: LWC
-
     scratch-org-test:
         runs-on: ubuntu-latest
         needs: format-lint-lwc-tests
