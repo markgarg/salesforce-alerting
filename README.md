@@ -15,7 +15,7 @@ In the current codebase, a sample Slack integration is provided.
 ## Sample usage
 
 First, configure the Slack params in the `Config__mdt` metadata.
-Use this for scheduling the alerts, the following alerts every minute but note that the Limits API callouts count against your org's API daily callout limit. Having said that, 1440 API calls isn't bad for the good monitoring you get.
+Use this for scheduling the alerts:
 
 ```
 BaseScheduler base = new BaseScheduler();
